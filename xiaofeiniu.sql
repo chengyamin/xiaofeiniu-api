@@ -5,32 +5,33 @@ USE xiaofeiniu;
 
 /*管理员*/
 CREATE TABLE xfn_admin(
-    aid INT PRIMARY KEY AUTO_INCREMENT,
-    aname VARCHAR(32) UNIQUE,
-    apwd VARCHAR(64)
+  aid INT PRIMARY KEY AUTO_INCREMENT,
+  aname VARCHAR(32) UNIQUE,
+  apwd VARCHAR(64)
 );
 INSERT INTO xfn_admin VALUES
-(NULL,'admin',PASSWORD('123456')),
-(NULL,'boss',PASSWORD('999999'));
+(NULL, 'admin', PASSWORD('123456')),
+(NULL, 'boss', PASSWORD('999999'));
 
 /*全局设置*/
 CREATE TABLE xfn_settings(
-    sid INT PRIMARY KEY AUTO_INCREMENT,
-    appName VARCHAR(32),
-    apiUrl VARCHAR(64),
-    adminUrl VARCHAR(64),
-    appUrl VARCHAR(64),
-    icp VARCHAR(64),
-    copyright VARCHAR(128)
+  sid INT PRIMARY KEY AUTO_INCREMENT,
+  appName VARCHAR(32),
+  apiUrl VARCHAR(64),
+  adminUrl VARCHAR(64),
+  appUrl VARCHAR(64),
+  icp VARCHAR(64),
+  copyright VARCHAR(128)
 );
 INSERT INTO xfn_settings VALUES
-(NULL,'小肥牛','http://127.0.0.1:8090','http://127.0.0.1:8091','http://127.0.0.1:8092','京ICP备12003709号-3','Copyright © 北京达内金桥科技有限公司版权所有');
-/*桌态表*/
+(NULL, '小肥牛', 'http://127.0.0.1:8090', 'http://127.0.0.1:8091', 'http://127.0.0.1:8092', '京ICP备12003709号-3', 'Copyright © 北京达内金桥科技有限公司版权所有');
+
+/*桌台表*/
 CREATE TABLE xfn_table(
-    tid INT PRIMARY KEY AUTO_INCREMENT,
-    tname VARCHAR(32),
-    type VARCHAR(32),
-    status INT
+  tid INT PRIMARY KEY AUTO_INCREMENT,
+  tname VARCHAR(32),
+  type VARCHAR(32),
+  status INT
 );
 INSERT INTO xfn_table VALUES
 (1, '金镶玉', '2人桌', 1),
@@ -47,14 +48,15 @@ INSERT INTO xfn_table VALUES
 (13, '高升阁', '4人桌', 3),
 (15, '乐逍遥', '2人桌',3);
 
-/*桌台预订信息*/
+/*桌台预定信息*/
 CREATE TABLE xfn_reservation(
-    rid INT PRIMARY KEY AUTO_INCREMENT,
-    contactName VARCHAR(32),
-    phone VARCHAR(16),
-    contactTime BIGINT,
-    dinnerTime BIGINT,
-    tableId INT
+  rid INT PRIMARY KEY AUTO_INCREMENT,
+  contactName VARCHAR(32),
+  phone VARCHAR(16),
+  contactTime BIGINT,
+  dinnerTime BIGINT,
+  tableId INT,
+  FOREIGN KEY(tableId) REFERENCES xfn_table(tid)
 );
 INSERT INTO xfn_reservation VALUES
 (NULL, '丁丁', '13501234561', '1548311700000', '1549011000000', '1'),
@@ -79,29 +81,27 @@ INSERT INTO xfn_reservation VALUES
 (NULL, '当当', '13501234567', '1548311900000', '1549011300000', '13'),
 (NULL, '丫丫', '13501234568', '1548311910000', '1549011200000', '15');
 
-
 /*菜品类别*/
 CREATE TABLE xfn_category(
-    cid INT PRIMARY KEY AUTO_INCREMENT,
-    cname VARCHAR(32)
-   
+  cid INT PRIMARY KEY AUTO_INCREMENT,
+  cname VARCHAR(32)
 );
 INSERT INTO xfn_category VALUES
-(NULL,'肉类'),
-(NULL,'丸滑类'),
-(NULL,'海鲜河鲜'),
-(NULL,'蔬菜豆制品'),
-(NULL,'菌菇类');
+(1, '肉类'),
+(2, '海鲜河鲜'),
+(3, '丸滑类'),
+(4, '蔬菜豆制品'),
+(5, '菌菇类');
 
-/*菜类*/
+/*菜品*/
 CREATE TABLE xfn_dish(
-    did INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(32),
-    imgUrl VARCHAR(128),
-    price DECIMAL(6,2),
-    detail VARCHAR(128),
-    categoryId INT,
-    FOREIGN KEY(categoryId) REFERENCES xfn_category(cid)
+  did INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(32),
+  imgUrl VARCHAR(128),
+  price DECIMAL(6,2),
+  detail VARCHAR(128),
+  categoryId INT,
+  FOREIGN KEY(categoryId) REFERENCES xfn_category(cid)
 );
 INSERT INTO xfn_dish VALUES
 (NULL, '草鱼片', 'r9470.jpg', '35', '选鲜活草鱼，切出鱼片冷鲜保存。锅开后再煮1分钟左右即可食用', '1'),
@@ -157,12 +157,12 @@ INSERT INTO xfn_dish VALUES
 
 /*订单*/
 CREATE TABLE xfn_order(
-    oid INT PRIMARY KEY AUTO_INCREMENT,
-    startTime BIGINT,
-    endTime BIGINT,
-    customerCount INT,
-    tableId INT,
-    FOREIGN KEY(tableId ) REFERENCES xfn_table(tid)
+  oid INT PRIMARY KEY AUTO_INCREMENT,
+  startTime BIGINT,
+  endTime BIGINT,
+  customerCount INT,
+  tableId INT,
+  FOREIGN KEY(tableId) REFERENCES xfn_table(tid)
 );
 INSERT INTO xfn_order VALUES
 (100000, '1547800000000', '1547814918000', '2', '1'),
@@ -194,45 +194,42 @@ INSERT INTO xfn_order VALUES
 
 /*订单详情*/
 CREATE TABLE xfn_order_detail(
-    did INT PRIMARY KEY AUTO_INCREMENT,
-    dishId INT,
-    dishCount INT,
-    customerName VARCHAR(32),
-    orderId INT,
-    FOREIGN KEY(dishId  ) REFERENCES xfn_dish(did),
-    FOREIGN KEY(orderId  ) REFERENCES xfn_order(oid)
+  oid INT PRIMARY KEY AUTO_INCREMENT,
+  dishId INT,       /*菜品编号*/
+  dishCount INT,    /*份数*/
+  customerName VARCHAR(32),    /*顾客名称*/
+  orderId INT,      /*订单编号*/
+  FOREIGN KEY(dishId) REFERENCES xfn_dish(did),
+  FOREIGN KEY(orderId) REFERENCES xfn_order(oid)
 );
 INSERT INTO xfn_order_detail VALUES
-(NULL, '50', '2', '丁丁', '100000','1'),
-(NULL, '24', '2', '丁丁', '100001','1'),
-(NULL, '37', '1', '当当', '100002','1'),
-(NULL, '18', '3', '豆豆', '100003','1'),
-(NULL, '22', '1', '丫丫', '100004','1'),
-(NULL, '21', '2', '丁丁', '100005','1'),
-(NULL, '36', '1', '当当', '100006','1'),
-(NULL, '1', '2', '豆豆', '100007','1'),
-(NULL, '3', '2', '丫丫', '100008','1'),
-(NULL, '11', '2', '丁丁', '100000','1'),
-(NULL, '14', '2', '丁丁', '100001','1'),
-(NULL, '27', '1', '当当', '100002','1'),
-(NULL, '8', '3', '豆豆', '100003','1'),
-(NULL, '42', '1', '丫丫', '100004','1'),
-(NULL, '11', '2', '丁丁', '100005','1'),
-(NULL, '16', '1', '当当', '100006','1'),
-(NULL, '1', '2', '豆豆', '100007','1'),
-(NULL, '3', '2', '丫丫', '100008','1'),
-(NULL, '15', '2', '丁丁', '100009','1'),
-(NULL, '4', '1', '当当', '100010','1'),
-(NULL, '12', '3', '豆豆', '100011','1'),
-(NULL, '9', '1', '丫丫', '100012','1'),
-(NULL, '33', '2', '丁丁', '100013','1'),
-(NULL, '24', '1', '当当', '100014','1'),
-(NULL, '30', '3', '豆豆', '100015','1'),
-(NULL, '20', '2', '丫丫', '100016','1'),
-(NULL, '16', '4', '当当', '100017','1'),
-(NULL, '8', '2', '丫丫', '100018','1'),
-(NULL, '8', '2', '丫丫', '100018','1'),
-(NULL, '8', '2', '丫丫', '100018'),
+(NULL, '50', '2', '丁丁', '100000'),
+(NULL, '24', '2', '丁丁', '100001'),
+(NULL, '37', '1', '当当', '100002'),
+(NULL, '18', '3', '豆豆', '100003'),
+(NULL, '22', '1', '丫丫', '100004'),
+(NULL, '21', '2', '丁丁', '100005'),
+(NULL, '36', '1', '当当', '100006'),
+(NULL, '1', '2', '豆豆', '100007'),
+(NULL, '3', '2', '丫丫', '100008'),
+(NULL, '11', '2', '丁丁', '100000'),
+(NULL, '14', '2', '丁丁', '100001'),
+(NULL, '27', '1', '当当', '100002'),
+(NULL, '8', '3', '豆豆', '100003'),
+(NULL, '42', '1', '丫丫', '100004'),
+(NULL, '11', '2', '丁丁', '100005'),
+(NULL, '16', '1', '当当', '100006'),
+(NULL, '1', '2', '豆豆', '100007'),
+(NULL, '3', '2', '丫丫', '100008'),
+(NULL, '15', '2', '丁丁', '100009'),
+(NULL, '4', '1', '当当', '100010'),
+(NULL, '12', '3', '豆豆', '100011'),
+(NULL, '9', '1', '丫丫', '100012'),
+(NULL, '33', '2', '丁丁', '100013'),
+(NULL, '24', '1', '当当', '100014'),
+(NULL, '30', '3', '豆豆', '100015'),
+(NULL, '20', '2', '丫丫', '100016'),
+(NULL, '16', '4', '当当', '100017'),
 (NULL, '8', '2', '丫丫', '100018'),
 (NULL, '6', '2', '丁丁', '100019'),
 (NULL, '5', '1', '当当', '100020'),
